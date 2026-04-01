@@ -1,4 +1,10 @@
-import { supabase } from './supabaseClient'
+import { hasSupabaseEnv, supabase } from './supabaseClient'
+
+function assertSupabaseConfigured() {
+  if (!hasSupabaseEnv || !supabase) {
+    throw new Error('Supabase environment variables are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+  }
+}
 
 /**
  * Security-aware error logging that strips sensitive data
@@ -49,6 +55,7 @@ function toBookingSlot(booking) {
  * @throws {Error} if not authenticated
  */
 async function requireAuth() {
+  assertSupabaseConfigured()
   const {
     data: { session },
     error,
@@ -92,6 +99,7 @@ function normalizeUserProfile(profile, authUser) {
 }
 
 async function fetchPublicUserProfile(userId) {
+  assertSupabaseConfigured()
   const { data, error } = await supabase.from('users').select('*').eq('id', userId).maybeSingle()
   if (error) {
     throw error
@@ -496,6 +504,7 @@ async function getAnalyticsFromSupabase(ownerId) {
 }
 
 export async function loginUser(credentials) {
+  assertSupabaseConfigured()
   const { data, error } = await supabase.auth.signInWithPassword({
     email: credentials.email,
     password: credentials.password,
@@ -520,6 +529,7 @@ export async function loginUser(credentials) {
 }
 
 export async function signupUser(input) {
+  assertSupabaseConfigured()
   const { data, error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
@@ -550,6 +560,9 @@ export async function signupUser(input) {
 }
 
 export async function getBusinessCatalog() {
+  if (!hasSupabaseEnv || !supabase) {
+    return { business: null, businesses: [], services: [] }
+  }
   return getBusinessCatalogFromSupabase()
 }
 
@@ -906,6 +919,9 @@ export async function updateUserProfile(userId, input) {
 }
 
 export async function getCurrentSessionUser() {
+  if (!hasSupabaseEnv || !supabase) {
+    return null
+  }
   const {
     data: { session },
     error,
@@ -934,6 +950,7 @@ export async function getCurrentSessionUser() {
 }
 
 export async function logoutUser() {
+  assertSupabaseConfigured()
   const { error } = await supabase.auth.signOut()
   if (error) {
     throw error

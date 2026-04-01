@@ -18,12 +18,22 @@ function Home() {
   const serviceSearch = searchParams.get('search') ?? ''
 
   useEffect(() => {
-    getBusinessCatalog().then(setCatalog)
+    getBusinessCatalog()
+      .then(setCatalog)
+      .catch((error) => {
+        console.error('Failed to load business catalog:', error)
+        setCatalog({ business: null, businesses: [], services: [] })
+      })
   }, [])
 
   useEffect(() => {
     if (currentUser?.role === 'customer') {
-      getCustomerBookings(currentUser.id).then(setBookings)
+      getCustomerBookings(currentUser.id)
+        .then(setBookings)
+        .catch((error) => {
+          console.error('Failed to load customer bookings:', error)
+          setBookings([])
+        })
     }
   }, [currentUser?.id, currentUser?.role])
 

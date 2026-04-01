@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '../utils/supabaseClient'
+import { hasSupabaseEnv, supabase } from '../utils/supabaseClient'
 import { getCurrentSessionUser, loginUser, logoutUser, signupUser } from '../utils/api'
 import { AuthContext } from './authContextObject.js'
 
@@ -8,6 +8,12 @@ function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!hasSupabaseEnv || !supabase) {
+      setCurrentUser(null)
+      setLoading(false)
+      return undefined
+    }
+
     let ignore = false
 
     async function syncCurrentUser() {
@@ -61,6 +67,7 @@ function AuthProvider({ children }) {
         await logoutUser()
         setCurrentUser(null)
       },
+      hasSupabaseEnv,
     }),
     [currentUser, loading],
   )
