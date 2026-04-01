@@ -10,6 +10,7 @@ function ServiceCard({ service, variant = 'default' }) {
       </div>
       <div>
         <h3>{service.name}</h3>
+        <p className="service-business-name">{service.business_name}</p>
         <p>{service.description}</p>
       </div>
       <div className="service-card__footer">

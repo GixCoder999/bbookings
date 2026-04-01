@@ -185,25 +185,22 @@ async function ensurePublicUserProfile({
 }
 
 async function getBusinessCatalogFromSupabase() {
-  const { data: business, error: businessError } = await supabase
+  const { data: businesses, error: businessesError } = await supabase
     .from('businesses')
     .select('*')
     .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
 
-  if (businessError) {
-    throw businessError
+  if (businessesError) {
+    throw businessesError
   }
 
-  if (!business) {
-    return { business: null, services: [] }
+  if (!businesses || businesses.length === 0) {
+    return { business: null, businesses: [], services: [] }
   }
 
   const { data: services, error: servicesError } = await supabase
     .from('services')
     .select('*')
-    .eq('business_id', business.id)
     .order('created_at', { ascending: true })
 
   if (servicesError) {
@@ -213,7 +210,6 @@ async function getBusinessCatalogFromSupabase() {
   const { data: availableSlots, error: slotsError } = await supabase
     .from('slots')
     .select('service_id')
-    .eq('business_id', business.id)
     .eq('status', 'available')
 
   if (slotsError) {
@@ -225,10 +221,15 @@ async function getBusinessCatalogFromSupabase() {
     return counts
   }, {})
 
+  const businessesById = Object.fromEntries(businesses.map((business) => [business.id, business]))
+
   return {
-    business,
+    business: null,
+    businesses,
     services: services.map((service) => ({
       ...service,
+      business: businessesById[service.business_id] ?? null,
+      business_name: businessesById[service.business_id]?.name ?? 'Business',
       availableSlots: slotCountByService[service.id] ?? 0,
     })),
   }

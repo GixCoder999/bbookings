@@ -105,18 +105,14 @@ function Home() {
               <div className="hero-showcase__head">
                 <div>
                   <p className="eyebrow">Today at a Glance</p>
-                  <h2>{catalog.business?.name ?? 'Loading workspace'}</h2>
+                  <h2>Service marketplace</h2>
                 </div>
                 <span className="hero-inline-badge hero-inline-badge--soft">Workspace snapshot</span>
               </div>
               <div className="hero-showcase__metrics">
                 <StatCard label="Services" value={catalog.services.length} hint="Published offers" />
+                <StatCard label="Businesses" value={catalog.businesses?.length ?? 0} hint="Active profiles" />
                 <StatCard label="Window" value="30 days" hint="Rolling availability" />
-                <StatCard
-                  label="Pending"
-                  value={visibleBookings.filter((booking) => booking.status === 'pending').length}
-                  hint="Customer-side requests"
-                />
               </div>
               <div className="hero-showcase__agenda">
                 <div className="hero-showcase__agenda-header">
@@ -188,8 +184,8 @@ function Home() {
       <section className="content-panel home-catalog-panel" ref={catalogSectionRef}>
         <SectionHeading
           eyebrow="Service Catalog"
-          title={catalog.business?.name ?? 'Services'}
-          description={catalog.business?.description ?? 'Bookable services arranged in a cleaner storefront layout.'}
+          title="Explore all services"
+          description="Browse the full cross-business feed and find the service that fits your schedule."
         />
         <div className="catalog-header-row">
           <div className="catalog-header-copy">
