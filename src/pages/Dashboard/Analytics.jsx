@@ -31,7 +31,7 @@ function Analytics() {
         <SectionHeading
           eyebrow="Service Popularity"
           title="Bookings by service"
-          description="Simple visual distribution for the current demo dataset."
+          description="Simple visual distribution of how booking demand is split across your services."
         />
         <div className="chart-list">
           {analytics.serviceBreakdown.map((entry) => (

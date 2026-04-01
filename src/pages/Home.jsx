@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard/ServiceCard.jsx'
 import SectionHeading from '../components/SectionHeading/SectionHeading.jsx'
 import StatCard from '../components/StatCard/StatCard.jsx'
@@ -13,6 +13,9 @@ function Home() {
   const { currentUser } = useAuth()
   const [catalog, setCatalog] = useState({ business: null, services: [] })
   const [bookings, setBookings] = useState([])
+  const [searchParams, setSearchParams] = useSearchParams()
+  const catalogSectionRef = useRef(null)
+  const serviceSearch = searchParams.get('search') ?? ''
 
   useEffect(() => {
     getBusinessCatalog().then(setCatalog)
@@ -26,6 +29,40 @@ function Home() {
 
   const visibleBookings = currentUser?.role === 'customer' ? bookings : []
   const featuredServices = catalog.services.slice(0, 6)
+  const normalizedServiceSearch = serviceSearch.trim().toLowerCase()
+  const visibleServices = featuredServices.filter((service) => {
+    if (!normalizedServiceSearch) {
+      return true
+    }
+
+    return [service.name, service.description]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(normalizedServiceSearch))
+  })
+
+  useEffect(() => {
+    if (!serviceSearch.trim()) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [serviceSearch, visibleServices.length])
+
+  function handleServiceSearchChange(value) {
+    const nextParams = new URLSearchParams(searchParams)
+
+    if (value.trim()) {
+      nextParams.set('search', value)
+    } else {
+      nextParams.delete('search')
+    }
+
+    setSearchParams(nextParams, { replace: true })
+  }
 
   return (
     <div className="page-shell home-page">
@@ -70,7 +107,7 @@ function Home() {
                   <p className="eyebrow">Today at a Glance</p>
                   <h2>{catalog.business?.name ?? 'Loading workspace'}</h2>
                 </div>
-                <span className="hero-inline-badge hero-inline-badge--soft">Live demo</span>
+                <span className="hero-inline-badge hero-inline-badge--soft">Workspace snapshot</span>
               </div>
               <div className="hero-showcase__metrics">
                 <StatCard label="Services" value={catalog.services.length} hint="Published offers" />
@@ -148,7 +185,7 @@ function Home() {
         </article>
       </section>
 
-      <section className="content-panel home-catalog-panel">
+      <section className="content-panel home-catalog-panel" ref={catalogSectionRef}>
         <SectionHeading
           eyebrow="Service Catalog"
           title={catalog.business?.name ?? 'Services'}
@@ -156,15 +193,27 @@ function Home() {
         />
         <div className="catalog-header-row">
           <div className="catalog-header-copy">
-            <strong>{catalog.services.length} services available</strong>
+            <strong>{visibleServices.length} services available</strong>
             <span>Choose a service to preview time options and request a booking.</span>
           </div>
+          <label className="catalog-search">
+            <span>Search services</span>
+            <input
+              value={serviceSearch}
+              onChange={(event) => handleServiceSearchChange(event.target.value)}
+              type="search"
+              placeholder="Search by name or description"
+            />
+          </label>
         </div>
         <div className="service-grid service-grid--showcase">
-          {featuredServices.map((service) => (
+          {visibleServices.map((service) => (
             <ServiceCard key={service.id} service={service} variant="showcase" />
           ))}
         </div>
+        {visibleServices.length === 0 && (
+          <p className="muted-text">No services match your search.</p>
+        )}
       </section>
 
       {currentUser?.role === 'customer' && (

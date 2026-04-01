@@ -36,11 +36,6 @@ function Login() {
             <span className="auth-promo-chip">Customer booking flow</span>
             <span className="auth-promo-chip">Approval queue</span>
           </div>
-          <div className="auth-demo-box">
-            <strong>Demo access</strong>
-            <p>Owner: `owner@demo.com` / `demo1234`</p>
-            <p>Customer: `customer@demo.com` / `demo1234`</p>
-          </div>
         </section>
 
         <form className="auth-card auth-form-panel" onSubmit={handleSubmit}>

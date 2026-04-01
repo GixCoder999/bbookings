@@ -1,14 +1,32 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth.js'
 import './Header.css'
 
 function Header() {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const [headerSearch, setHeaderSearch] = useState(searchParams.get('search') ?? '')
+
+  const isHomePage = location.pathname === '/'
+
+  useEffect(() => {
+    if (isHomePage) {
+      setHeaderSearch(searchParams.get('search') ?? '')
+    }
+  }, [isHomePage, searchParams])
 
   async function handleLogout() {
     await logout()
     navigate('/')
+  }
+
+  function handleSearchSubmit(event) {
+    event.preventDefault()
+    const nextSearch = headerSearch.trim()
+    navigate(nextSearch ? `/?search=${encodeURIComponent(nextSearch)}` : '/')
   }
 
   return (
@@ -24,6 +42,19 @@ function Header() {
           <strong>BBookings</strong>
         </div>
       </Link>
+
+      <form className="header-search" onSubmit={handleSearchSubmit}>
+        <input
+          value={headerSearch}
+          onChange={(event) => setHeaderSearch(event.target.value)}
+          type="search"
+          placeholder="Search services"
+          aria-label="Search services"
+        />
+        <button className="ghost-button" type="submit">
+          Search
+        </button>
+      </form>
 
       <nav className="main-nav">
         <NavLink to="/">Home</NavLink>
