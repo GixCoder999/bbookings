@@ -1,0 +1,23 @@
+.status-badge {
+  display: inline-flex;
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  text-transform: capitalize;
+  background: rgba(33, 26, 20, 0.08);
+}
+
+.status-confirmed {
+  color: var(--success);
+  background: rgba(45, 123, 87, 0.12);
+}
+
+.status-pending {
+  color: var(--warning);
+  background: rgba(170, 106, 0, 0.12);
+}
+
+.status-cancelled {
+  color: var(--danger);
+  background: rgba(175, 61, 61, 0.12);
+}

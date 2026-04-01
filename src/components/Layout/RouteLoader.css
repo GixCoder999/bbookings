@@ -1,0 +1,50 @@
+.route-loader {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  pointer-events: none;
+  animation: route-loader-fade 520ms ease forwards;
+}
+
+.route-loader__bar {
+  height: 4px;
+  width: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #34d399 0%, #14b8a6 36%, #0ea5e9 74%, #8b5cf6 100%);
+  animation: route-loader-bar 720ms ease-in-out infinite;
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.34);
+}
+
+.route-loader__glow {
+  height: 26px;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.18), transparent);
+}
+
+@keyframes route-loader-bar {
+  0% {
+    transform: scaleX(0.12);
+  }
+
+  50% {
+    transform: scaleX(0.68);
+  }
+
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes route-loader-fade {
+  0% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
